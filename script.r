@@ -147,53 +147,60 @@ df.state$hash <- NULL
 df.state$dateChecked <- NULL
   #Creating a Texas df
   tx.df <- df.state[which(df.state$state=="TX"),]
-  tx.df$Day.Metric <- c(27:1) #update the left to account for time
-  tx.df$Rate.of.Infection <- c(tx.df$positiveIncrease/tx.df$Day.Metric)
+  tx.df$Day.Metric <- c(nrow(tx.df):1) 
   #Creating a NY df
   ny.df <- df.state[which(df.state$state=="NY"),]
-  ny.df$Day.Metric <- c(27:1) #update the left to account for time
-  ny.df$Rate.of.Infection <- c(ny.df$positiveIncrease/ny.df$Day.Metric)
+  ny.df$Day.Metric <- c(nrow(ny.df):1) 
   #Creating a Michigan df
   mi.df <- df.state[which(df.state$state=="MI"),]
-  mi.df$Day.Metric <- c(26:1) #update the left to account for time
-  mi.df$Rate.of.Infection <- c(mi.df$positiveIncrease/mi.df$Day.Metric)
+  mi.df$Day.Metric <- c(nrow(mi.df):1) 
   #Creating a Was df
   wa.df <- df.state[which(df.state$state=="WA"),]
-  wa.df$Day.Metric <- c(27:1) #update the left to account for time
-  wa.df$Rate.of.Infection <- c(wa.df$positiveIncrease/wa.df$Day.Metric)
+  wa.df$Day.Metric <- c(nrow(wa.df):1) 
   #Creating a California df
   ca.df <- df.state[which(df.state$state=="CA"),]
-  ca.df$Day.Metric <- c(27:1) #update the left to account for time
-  ca.df$Rate.of.Infection <- c(ca.df$positiveIncrease/ca.df$Day.Metric)
+  ca.df$Day.Metric <- c(nrow(ca.df):1) 
   #Creating a Lousiana df
   la.df <- df.state[which(df.state$state=="LA"),]
-  la.df$Day.Metric <- c(24:1) #update the left to account for time
-  la.df$Rate.of.Infection <- c(la.df$positiveIncrease/la.df$Day.Metric)
+  la.df$Day.Metric <- c(nrow(la.df):1) 
+  #Creating a NewJersey df
+  nj.df <- df.state[which(df.state$state=="NJ"),]
+  nj.df$Day.Metric <- c(nrow(nj.df):1) 
+  #Creating a Florida df
+  fl.df <- df.state[which(df.state$state=="FL"),]
+  fl.df$Day.Metric <- c(nrow(fl.df):1) 
+  #Creating a Georgia df
+  ga.df <- df.state[which(df.state$state=="GA"),]
+  ga.df$Day.Metric <- c(nrow(ga.df):1) 
+  #Creating an Ohio df
+  oh.df <- df.state[which(df.state$state=="OH"),]
+  oh.df$Day.Metric <- c(nrow(oh.df):1) 
+  #Creating an Pen df
+  pa.df <- df.state[which(df.state$state=="PA"),]
+  pa.df$Day.Metric <- c(nrow(pa.df):1) 
+  #Creating an Indiana df
+  in.df <- df.state[which(df.state$state=="IN"),]
+  in.df$Day.Metric <- c(nrow(in.df):1) 
+  #Creating an Mass. df
+  ma.df <- df.state[which(df.state$state=="MA"),]
+  ma.df$Day.Metric <- c(nrow(ma.df):1) 
+  #Creating an Illnois df
+  il.df <- df.state[which(df.state$state=="IL"),]
+  il.df$Day.Metric <- c(nrow(il.df):1) 
 #Binding them
-keystates.df <- rbind(ny.df,tx.df,ca.df,wa.df,mi.df,la.df)
+keystates.df <- rbind(ny.df,tx.df,ca.df,wa.df,mi.df,la.df,nj.df,fl.df,ga.df,oh.df,pa.df,in.df,ma.df,il.df)
   #Plotting them together
-  #New Cases/New Tests
-  plotly.5 <- keystates.df %>%
-    ggplot( aes(x=Day.Metric, y=positiveIncrease/totalTestResults, group=state, color=state)) +
-    geom_line(size=0.5) +
-    scale_color_viridis(discrete = TRUE) +
-    ggtitle("New Cases in the US as Percent of Total Tests") +
-    ylab("New Cases as Percent of Total Tests")+
-    xlab("Days Since Case 1")+
-    xlim(1,30)+
-    ylim(-0.3,1.1)
-  plotly.5 <- ggplotly(plotly.5)
-  plotly.5
   #New Cases
   plotly.6 <- keystates.df %>%
-    ggplot( aes(x=Day.Metric, y=positiveIncrease, group=state, color=state)) +
+    ggplot( aes(x=Day.Metric, y=positive, group=state, color=state)) +
     geom_line(size=1) +
     scale_color_viridis(discrete = TRUE) +
-    ggtitle("New Cases in the US") +
-    ylab("New Cases")+
+    ggtitle("Cases in the US") +
+    ylab("Cases")+
     xlab("Days Since Case 1")+
     xlim(1,30)+
-    ylim(-0.3,7000)
+    ylim(-0.3,90000)
   plotly.6 <- ggplotly(plotly.6)
   plotly.6
-#==============Foccusing on ICUs and Hospitalizations
+#==============Foccusing on Vent. and Hospitalizations
+  
