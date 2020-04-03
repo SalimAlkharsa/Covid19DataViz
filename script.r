@@ -64,8 +64,7 @@ ggplot(df.state, aes(x = date, y = totalTestResultsIncrease)) +
 #========================For Tracking Growth rate
 url.2 <- "https://covidtracking.com/api/us/daily"
 us.df <- fromJSON(url.2) %>% as.data.frame
-us.df$Day.Metric <- c(27:1) #update the left to account for time
-us.df$Rate.of.Infection <- c(us.df$positive/us.df$Day.Metric)
+us.df$Day.Metric <- c(nrow(us.df):1) #update the left to account for time
 #Removing dumb metrics
 us.df$date <- NULL
 us.df$states <- NULL
@@ -77,65 +76,6 @@ us.df$dateChecked <- NULL
 germany.df <- data.frame("Day.Metric" = (1:16), "positive" = c(4599,5813,7272,9367,12327,15320,19848,
                                                                22364,24873,29056,32991,37323,43938,50871,
                                                                56202,58247))
-germany.df$Rate.of.Infection <- c(germany.df$positive/germany.df$Day.Metric)
-#Plotting Germany and US Rate.of.Infection
-us.plotly <- us.df %>%
-  ggplot( aes(x = Day.Metric, y = Rate.of.Infection)) +
-  geom_area(fill="navyblue", alpha=0.5) +
-  geom_line(color="navyblue") +
-  ylab("Rate of Growth") +
-  xlab("Days Since Case 1")+
-  ggtitle("Rate of growth of cases in the US")+
-  xlim(0,25)+
-  ylim(0,4000)
-us.plotly <- ggplotly(us.plotly)
-us.plotly
-germany.plotly <- germany.df %>%
-  ggplot(aes(x= Day.Metric, y= Rate.of.Infection)) +
-  geom_area(fill="red4", alpha=0.5) +
-  geom_line(color="red4") +
-  ylab("Rate of Growth") +
-  xlab("Days Since Case 1")+
-  ggtitle("Rate of growth of cases in Germany")+
-  xlim(0,25)+
-  ylim(0,4000)
-germany.plotly <- ggplotly(germany.plotly)
-germany.plotly
-#=================Scraping for stats for states and plotting them
-#Web-Scrapping For State Data
-url <- "https://covidtracking.com/api/states/daily"
-df.state <- fromJSON(url) %>% as.data.frame
-  #Creating a Texas df
-  tx.df <- df.state[which(df.state$state=="TX"),]
-  tx.df$Day.Metric <- c(27:1) #update the left to account for time
-  tx.df$Rate.of.Infection <- c(tx.df$positive/tx.df$Day.Metric)
-  #Removing dumb metrics
-  tx.df$date <- NULL
-  tx.df$states <- NULL
-  tx.df$hash <- NULL
-  tx.df$dateChecked <- NULL
-  #Creating a NY df
-  ny.df <- df.state[which(df.state$state=="NY"),]
-  ny.df$Day.Metric <- c(27:1) #update the left to account for time
-  ny.df$Rate.of.Infection <- c(ny.df$positive/ny.df$Day.Metric)
-  #Removing dumb metrics
-  ny.df$date <- NULL
-  ny.df$states <- NULL
-  ny.df$hash <- NULL
-  ny.df$dateChecked <- NULL
-#Merging the dfs for a plot
-tx.ny.df <- rbind(ny.df,tx.df)
-#Plotting them together
-  #Rate of infection
-  tx.ny.df %>%
-    ggplot( aes(x=Day.Metric, y=Rate.of.Infection, group=state, color=state)) +
-    geom_line() +
-    scale_color_viridis(discrete = TRUE) +
-    ggtitle("Rate of Infection Across States in the US") +
-    ylab("Rate of Infection")+
-    xlab("Days Since Case 1")+
-    xlim(0,30)+
-    ylim(0,2500)
 #============Doing the analysis on many states
 #Loading state stuff
 url <- "https://covidtracking.com/api/states/daily"
@@ -202,5 +142,5 @@ keystates.df <- rbind(ny.df,tx.df,ca.df,wa.df,mi.df,la.df,nj.df,fl.df,ga.df,oh.d
     ylim(-0.3,90000)
   plotly.6 <- ggplotly(plotly.6)
   plotly.6
-#==============Foccusing on Vent. and Hospitalizations
+#==============Foccusing on ICUs and Hospitalizations
   
