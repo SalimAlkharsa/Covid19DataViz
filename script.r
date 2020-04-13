@@ -1,8 +1,3 @@
-#============Load DF for the General Overview
-df <- read.csv("df.csv", header = TRUE)
-#Fixing errors in the df
-df[8, 6] = 1089.9
-df[2, 6] = 827.7
 #Libraries
 library(tidyverse)
 library(viridis)
@@ -12,71 +7,7 @@ library(ggplot2)
 library (httr) 
 library (jsonlite)
 library(plotly)
-#======Data is Good Until March 22=======#
-# Age
-ggplot(df, aes(x = Median.Country.Age, y = Serious.Cases..)) +
-  geom_bar(stat = "identity", width=0.4) +
-  facet_wrap(~Class.Of.Testing..A.is.best.) + 
-  ggtitle("Serious Cases By Age and Testing Intensity") +
-  xlab("Median Age") +
-  ylab("Serious case%")+
-  xlim(35,50)+
-  ylim(0,0.125)
-#Smokers
-ggplot(df, aes(x = Smokers.Capita, y = Serious.Cases..)) +
-  geom_bar(stat = "identity", width=10) +
-  facet_wrap(~Class.Of.Testing..A.is.best.) + 
-  ggtitle("Serious Cases By Smoking and Testing Intensity") +
-  xlab("Smokers Per Capita") +
-  ylab("Serious case%")+
-  xlim(800,2000)+
-  ylim(0,0.125)
-#Location Just for fun ###fix it more
-world <- map_data("world")
-lon <- c(126.3720,-1.522559,5.857520,-123.1696,9.524023,3.350097,6.627735,-4.762500,-9.235645)
-lat <- c(33.22363,55.25952,51.03012,48.58672,47.52422,51.37769,45.11797,48.45024,43.03579)
-df$lon <- lon
-df$lat <- lat
-ggplot(df, aes(x=lon, y=lat)) + 
-  geom_polygon(data = world, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
-  geom_bin2d(bins=100) +
-  theme_void() +
-  ggtitle("% Serious Wuhan Virus Cases By Country")+
-  scale_fill_viridis(name= "% Serious Wuhan Virus Cases By Country")
-#======New State by State Data=======#
-#Web-Scrapping For State Data
-url <- "https://covidtracking.com/api/states/daily"
-df.state <- fromJSON(url) %>% as.data.frame
-#Creating a graph on case increases
-ggplot(df.state, aes(x = date, y = positive), y= "log") +
-  geom_bar(stat = "identity", width=0.4) +
-  facet_wrap(~state) + 
-  ggtitle("Increases in Cases") +
-  xlab("Date") +
-  ylab("Cases")
-#Creating a graph on testing increases
-ggplot(df.state, aes(x = date, y = totalTestResultsIncrease)) +
-  geom_bar(stat = "identity", width=0.4) +
-  facet_wrap(~state) + 
-  ggtitle("Increases in Testing") +
-  xlab("Date") +
-  ylab("Tests")
-#========================For Tracking Growth rate
-url.2 <- "https://covidtracking.com/api/us/daily"
-us.df <- fromJSON(url.2) %>% as.data.frame
-us.df$Day.Metric <- c(nrow(us.df):1) #update the left to account for time
-#Removing dumb metrics
-us.df$date <- NULL
-us.df$states <- NULL
-us.df$hash <- NULL
-us.df$dateChecked <- NULL
-#Graph US Rate of Growth
-#Using Germany bc Germany is apparently doing really well
-#Link for updating https://tradingeconomics.com/germany/coronavirus-cases
-germany.df <- data.frame("Day.Metric" = (1:16), "positive" = c(4599,5813,7272,9367,12327,15320,19848,
-                                                               22364,24873,29056,32991,37323,43938,50871,
-                                                               56202,58247))
-#============Doing the analysis on many states
+library(formattable)
 #Loading state stuff
 url <- "https://covidtracking.com/api/states/daily"
 df.state <- fromJSON(url) %>% as.data.frame
@@ -85,62 +16,107 @@ df.state$date <- NULL
 df.state$states <- NULL
 df.state$hash <- NULL
 df.state$dateChecked <- NULL
+df.state$posNeg <- NULL
+df.state$fips <- NULL
+df.state$pending <- NULL
+df.state$total <- NULL
+df.state$negative <- NULL
+df.state$hospitalizedCumulative <- NULL
+df.state$inIcuCumulative <- NULL
+df.state$onVentilatorCumulative <- NULL
+df.state$hospitalized <- NULL
+df.state$negativeIncrease <- NULL
+df.state <- df.state %>% 
+  rename(
+    State = state,
+    Currently.Hospitalized = hospitalizedCurrently,
+    Currently.In.ICU = inIcuCurrently,
+    Currently.On.Ventilator = onVentilatorCurrently,
+    Current.Cases = positive,
+    Recovered = recovered,
+    Deaths = death,
+    Increase.In.Deaths = deathIncrease,
+    Increase.In.Cases = positiveIncrease,
+    Increase.In.Testing = totalTestResultsIncrease,
+    Total.Test.Results = totalTestResults,
+    Increase.In.Hospitalizations = hospitalizedIncrease
+  )
   #Creating a Texas df
-  tx.df <- df.state[which(df.state$state=="TX"),]
+  tx.df <- df.state[which(df.state$State=="TX"),]
   tx.df$Day.Metric <- c(nrow(tx.df):1) 
+  tx.df <- subset(tx.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating a NY df
-  ny.df <- df.state[which(df.state$state=="NY"),]
+  ny.df <- df.state[which(df.state$State=="NY"),]
   ny.df$Day.Metric <- c(nrow(ny.df):1) 
+  ny.df <- subset(ny.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating a Michigan df
-  mi.df <- df.state[which(df.state$state=="MI"),]
+  mi.df <- df.state[which(df.state$State=="MI"),]
   mi.df$Day.Metric <- c(nrow(mi.df):1) 
+  mi.df <- subset(mi.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating a Was df
-  wa.df <- df.state[which(df.state$state=="WA"),]
+  wa.df <- df.state[which(df.state$State=="WA"),]
   wa.df$Day.Metric <- c(nrow(wa.df):1) 
+  wa.df <- subset(wa.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating a California df
-  ca.df <- df.state[which(df.state$state=="CA"),]
+  ca.df <- df.state[which(df.state$State=="CA"),]
   ca.df$Day.Metric <- c(nrow(ca.df):1) 
+  ca.df <- subset(ca.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating a Lousiana df
-  la.df <- df.state[which(df.state$state=="LA"),]
+  la.df <- df.state[which(df.state$State=="LA"),]
   la.df$Day.Metric <- c(nrow(la.df):1) 
+  la.df <- subset(la.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating a NewJersey df
-  nj.df <- df.state[which(df.state$state=="NJ"),]
+  nj.df <- df.state[which(df.state$State=="NJ"),]
   nj.df$Day.Metric <- c(nrow(nj.df):1) 
+  nj.df <- subset(nj.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating a Florida df
-  fl.df <- df.state[which(df.state$state=="FL"),]
+  fl.df <- df.state[which(df.state$State=="FL"),]
   fl.df$Day.Metric <- c(nrow(fl.df):1) 
+  fl.df <- subset(fl.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating a Georgia df
-  ga.df <- df.state[which(df.state$state=="GA"),]
+  ga.df <- df.state[which(df.state$State=="GA"),]
   ga.df$Day.Metric <- c(nrow(ga.df):1) 
+  ga.df <- subset(ga.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating an Ohio df
-  oh.df <- df.state[which(df.state$state=="OH"),]
+  oh.df <- df.state[which(df.state$State=="OH"),]
   oh.df$Day.Metric <- c(nrow(oh.df):1) 
+  oh.df <- subset(oh.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating an Pen df
-  pa.df <- df.state[which(df.state$state=="PA"),]
+  pa.df <- df.state[which(df.state$State=="PA"),]
   pa.df$Day.Metric <- c(nrow(pa.df):1) 
+  pa.df <- subset(pa.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating an Indiana df
-  in.df <- df.state[which(df.state$state=="IN"),]
+  in.df <- df.state[which(df.state$State=="IN"),]
   in.df$Day.Metric <- c(nrow(in.df):1) 
+  in.df <- subset(in.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating an Mass. df
-  ma.df <- df.state[which(df.state$state=="MA"),]
+  ma.df <- df.state[which(df.state$State=="MA"),]
   ma.df$Day.Metric <- c(nrow(ma.df):1) 
+  ma.df <- subset(ma.df, select=c(Day.Metric,State:Increase.In.Testing))
   #Creating an Illnois df
-  il.df <- df.state[which(df.state$state=="IL"),]
+  il.df <- df.state[which(df.state$State=="IL"),]
   il.df$Day.Metric <- c(nrow(il.df):1) 
+  il.df <- subset(il.df, select=c(Day.Metric,State:Increase.In.Testing))
 #Binding them
 keystates.df <- rbind(ny.df,tx.df,ca.df,wa.df,mi.df,la.df,nj.df,fl.df,ga.df,oh.df,pa.df,in.df,ma.df,il.df)
+keystates.df <- keystates.df %>% arrange(desc(Day.Metric))
   #Plotting them together
-  #New Cases
+  #Cases
   plotly.6 <- keystates.df %>%
-    ggplot( aes(x=Day.Metric, y=positive, group=state, color=state)) +
+    ggplot( aes(x=Day.Metric, y=Current.Cases, group=State, color=State)) +
     geom_line(size=1) +
     scale_color_viridis(discrete = TRUE) +
     ggtitle("Cases in the US") +
     ylab("Cases")+
     xlab("Days Since Case 1")+
-    xlim(1,30)+
-    ylim(-0.3,90000)
+    xlim(1,70)+
+    ylim(-0.3,190000)
   plotly.6 <- ggplotly(plotly.6)
   plotly.6
-#==============Foccusing on ICUs and Hospitalizations
-  
+#==============Creating a Visually Appealling Table
+formattable(keystates.df, list(
+  Current.Cases = color_tile("white", "orange"), Currently.Hospitalized = color_tile("white", "orange"),
+  Currently.In.Icu = color_tile("white", "orange"), Currently.On.Ventilator = color_tile("white", "orange"),
+  Recovered = color_tile("white", "green"), Deaths = color_tile("white", "red"),
+  Total.Test.Results = color_tile("white", "green"), Increase.In.Hospitalizations = color_tile("white", "green"),
+  Increase.In.Testing = color_tile("white", "green")))
