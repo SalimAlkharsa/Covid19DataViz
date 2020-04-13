@@ -113,10 +113,12 @@ keystates.df <- keystates.df %>% arrange(desc(Day.Metric))
     ylim(-0.3,190000)
   plotly.6 <- ggplotly(plotly.6)
   plotly.6
-#==============Creating a Visually Appealling Table
+#==============Creating a Visually Appealling Table for Cases
 formattable(keystates.df, list(
   Current.Cases = color_tile("white", "orange"), Currently.Hospitalized = color_tile("white", "orange"),
   Currently.In.Icu = color_tile("white", "orange"), Currently.On.Ventilator = color_tile("white", "orange"),
   Recovered = color_tile("white", "green"), Deaths = color_tile("white", "red"),
-  Total.Test.Results = color_tile("white", "green"), Increase.In.Hospitalizations = color_tile("white", "green"),
-  Increase.In.Testing = color_tile("white", "green")))
+  Total.Test.Results = color_tile("white", "green"), Increase.In.Hospitalizations = color_tile("white", "orange"),
+  Increase.In.Testing = color_tile("white", "green"), Currently.In.ICU = color_tile("white", "orange"),
+  Increase.In.Deaths = color_tile("white", "red"), Increase.In.Cases = color_tile("white", "orange")))
+#==============Creating a Graph for Projections (under construction)
