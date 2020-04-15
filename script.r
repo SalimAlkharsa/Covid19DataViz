@@ -110,7 +110,7 @@ keystates.df <- keystates.df %>% arrange(desc(Day.Metric))
     ylab("Cases")+
     xlab("Days Since Case 1")+
     xlim(1,70)+
-    ylim(-0.3,190000)
+    ylim(-0.3,200000)
   plotly.6 <- ggplotly(plotly.6)
   plotly.6
 #==============Creating a Visually Appealling Table for Cases
@@ -121,4 +121,16 @@ formattable(keystates.df, list(
   Total.Test.Results = color_tile("white", "green"), Increase.In.Hospitalizations = color_tile("white", "orange"),
   Increase.In.Testing = color_tile("white", "green"), Currently.In.ICU = color_tile("white", "orange"),
   Increase.In.Deaths = color_tile("white", "red"), Increase.In.Cases = color_tile("white", "orange")))
-#==============Creating a Graph for Projections (under construction)
+#==============Looking at Deaths and how they developed
+keystates.df$logdeaths <- c(log(keystates.df$Deaths,10))
+plotly.7 <- keystates.df %>%
+  ggplot( aes(x=Day.Metric, y=logdeaths, group=State, color=State)) +
+  geom_line(size=1) +
+  scale_color_viridis(discrete = TRUE) +
+  ggtitle("Deaths in the US") +
+  ylab("Deaths (log10 Scale)")+
+  xlab("Days Since Case 1")+
+  xlim(1,70)+
+  ylim(-0.3,4.7)
+plotly.7 <- ggplotly(plotly.7)
+plotly.7
