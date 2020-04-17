@@ -103,14 +103,14 @@ keystates.df <- keystates.df %>% arrange(desc(Day.Metric))
   #Plotting them together
   #Cases
   plotly.6 <- keystates.df %>%
-    ggplot( aes(x=Day.Metric, y=Current.Cases, group=State, color=State)) +
+    ggplot( aes(x=Day.Metric, y=log(Current.Cases,10), group=State, color=State)) +
     geom_line(size=1) +
     scale_color_viridis(discrete = TRUE) +
     ggtitle("Cases in the US") +
-    ylab("Cases")+
+    ylab("Cases (log10 Scale)")+
     xlab("Days Since Case 1")+
-    xlim(1,70)+
-    ylim(-0.3,200000)
+    xlim(1,55)+
+    ylim(-0.3,7)
   plotly.6 <- ggplotly(plotly.6)
   plotly.6
 #==============Creating a Visually Appealling Table for Cases
@@ -134,3 +134,31 @@ plotly.7 <- keystates.df %>%
   ylim(-0.3,4.7)
 plotly.7 <- ggplotly(plotly.7)
 plotly.7
+#================When Can We ReOpen
+url.1 <- "https://covidtracking.com/api/us/daily"
+us.df <- fromJSON(url.1) %>% as.data.frame
+us.df$positvityRate <- c(us.df$positive/us.df$posNeg)
+us.df$Day.Metric <- c(nrow(us.df):1) 
+#Graph on cases
+plotly.8 <- us.df %>%
+  ggplot(aes(x= Day.Metric, y= positiveIncrease)) + 
+  geom_bar(stat = "identity", width=0.2) +
+  ggtitle("Case Increases in the Past 14 Days") +
+  ylab("Case Increases")+
+  xlab("The Last 14 Days")+
+  xlim((nrow(us.df)-14),nrow(us.df))+
+  ylim(-0.3,40000)
+plotly.8 <- ggplotly(plotly.8)
+plotly.8
+#Graph on rate
+plotly.9 <- us.df %>%
+  ggplot(aes(x= Day.Metric, y= positvityRate)) + 
+  geom_bar(stat = "identity", width=0.2) +
+  ggtitle("% Positive in the Past 14 Days") +
+  ylab("% Positive")+
+  xlab("The Last 14 Days")+
+  xlim((nrow(us.df)-14),nrow(us.df))+
+  ylim(0,0.26)
+plotly.9 <- ggplotly(plotly.9)
+plotly.9
+  
